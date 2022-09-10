@@ -1,0 +1,41 @@
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    padding:20px;
+}
+img {
+    max-width: 100%;
+}
+.hide {
+    display: none;
+}
+.show {
+    display: block;
+}
+.open {
+    cursor: pointer;
+    text-decoration: underline;
+}
+main {
+    padding-right: 250px;
+}
+header {
+    text-align: center;
+}
+aside {
+    width: 200px;
+    padding:5px 10px;
+    font-size: .75em;
+    position: fixed;
+    top:0;
+    right:0;
+    bottom:0;
+    border-left: 1px double #000;
+    overflow-y: auto;
+}
+aside div {
+    display: none;
+}
+
+img.card {
+    max-width:450px;
+}
