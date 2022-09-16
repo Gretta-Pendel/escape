@@ -105,17 +105,16 @@ aside div {
     height: 50px;
 }
 .hpBox {
+    padding-right: 10px;
 }
-.charBar button, .cardButton {
+.charButton, .charGetItemButton, .cardButton, .hpButton {
     background-color: #eee;
     border: none;
-    font-size: 32px;
+    font-size: 30px;
     line-height: 40px;
     vertical-align: middle;
     text-align: center;
     padding: 0;
-    float: left;
-    clear:left;
     cursor: pointer;
     background-color:#ddd;
     border-style: solid;
@@ -123,7 +122,14 @@ aside div {
     border-color: transparent #ccc #ccc transparent;
     border-radius: 4px;
 }
-.charBar button:hover, .cardButton:hover {
+.charButton, .charGetItemButton, .cardButton {
+    float: left;
+    clear:left;
+}
+.hpButton {
+    margin-left: 10px;
+}
+.charButton:hover, .charGetItemButton:hover, .cardButton:hover, .hpButton:hover {
     background-color:#ccc;
     border-color: #999 transparent transparent #999;
 }
@@ -132,7 +138,7 @@ aside div {
 }
 .charBar button, .cardButton {
     height: 40px;
-    width:40px;
+    min-width:40px;
 }
 .char-die {
     word-break: break-all;
