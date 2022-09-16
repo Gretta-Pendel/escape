@@ -1,30 +1,47 @@
+/* reset */
+* {
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
+}
+html, body {
+    padding:0;
+    margin:0;
+    width: 100%;
+}
 body {
     font-family: Georgia, 'Times New Roman', Times, serif;
-    padding:20px;
 }
-img {
-    max-width: 100%;
+img {max-width: 100%;}
+
+/* common rules */
+ul, ol {
+    padding-left: 15px;
+    border-radius: none;
 }
-.hide {
-    display: none;
+input, button, select {
+    padding:3px 5px;
 }
-.show {
-    display: block;
-}
-.open {
-    cursor: pointer;
-    text-decoration: underline;
-}
-main {
-    padding-right: 250px;
-}
+.hide {display: none;}
+.show {display: block;}
+.open {cursor: pointer;text-decoration: underline;}
+
+/* layout */
 header {
     text-align: center;
+    margin-bottom: 10px;
+}
+header img {
+    max-width: 300px;
+}
+main {
+    padding: 20px 230px 20px 20px;
 }
 aside {
-    width: 200px;
+    width: 230px;
     padding:5px 10px;
-    font-size: .75em;
+    font-size: .8em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: fixed;
     top:0;
     right:0;
@@ -32,10 +49,217 @@ aside {
     border-left: 1px double #000;
     overflow-y: auto;
 }
+aside h1, h2 {
+    font-weight: 500;
+}
+aside h2 {
+    color:#333;
+    font-size: 1.15em;
+}
 aside div {
     display: none;
 }
+#start > select {
+    margin: 10px 0;
+}
+#newGame {
+    padding-bottom: 10px;
+    height:35px;
+}
+#newGame select {
+    margin-right:10px;
+}
 
-img.card {
-    max-width:450px;
+/**/
+.gameTable {
+    display: flex;
+    justify-content:flex-start;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+.deckInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Character */
+#charactersBox {
+    flex-basis: 50%;
+    display: flex;
+    flex-direction: column;
+    margin: 20px -20px;
+}
+#charactersBox article {
+    padding: 0 20px;
+    min-height: 280px;
+    width: 510px;
+}
+.charBar, .cardDice {
+    display: flex;
+    background-color:#eee;
+    padding: 5px;
+    line-height: 40px;
+    justify-content: space-between;
+}
+.charBar {
+    height: 50px;
+}
+.hpBox {
+}
+.charBar button, .cardButton {
+    background-color: #eee;
+    border: none;
+    font-size: 32px;
+    line-height: 40px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0;
+    float: left;
+    clear:left;
+    cursor: pointer;
+    background-color:#ddd;
+    border-style: solid;
+    border-width: 1px;
+    border-color: transparent #ccc #ccc transparent;
+    border-radius: 4px;
+}
+.charBar button:hover, .cardButton:hover {
+    background-color:#ccc;
+    border-color: #999 transparent transparent #999;
+}
+#charactersBox article input {
+    width:30px;
+}
+.charBar button, .cardButton {
+    height: 40px;
+    width:40px;
+}
+.char-die {
+    word-break: break-all;
+}
+img.dice {
+    max-width: 40px;
+}
+.charImage {
+    position: absolute;
+    width: 150px;
+    height:230px;
+    left:15px;
+    overflow: hidden;
+    text-align: center;
+}
+img.char {
+    width: 158px;
+    max-width: 158px;
+}
+
+/* Items */
+.charItems {
+    padding-left: 150px;
+    display: flex;
+    width: 470px;
+}
+.item-box {
+    width: 50%;
+    flex-basis: 50%;
+    max-width: 160px;
+    position: relative;
+    padding-top: 225px;
+    font-size: 12px;
+}
+img.item {
+    width: 159px;
+    position: absolute;
+    top:0;
+    left:0;
+}
+.item-box div {
+    position: absolute;
+    left:13px;
+    width: 134px;
+    text-align: center;
+}
+img.item + div {
+    top:13px;
+    height: 30px;
+}
+.item-box .type {
+    top:35px;
+    font-style: italic;
+    margin: 2px 0;
+}
+.item-box .type + div {
+    top:165px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 10px;
+}
+.item-box button {
+    position: absolute;
+    right:0;
+    bottom:0;
+    width:25px;
+    height:25px;
+    line-height: 25px;
+    font-size: 18px;
+    border-radius:0;
+    padding: 0;
+    border:1px solid #ccc;
+}
+
+/* Deck */
+#deckBox {
+    flex-basis: 50%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+#deckBox img {
+    max-width:200px;
+    border: 1px solid #ddd;
+}
+.current, .deck {
+    width: 240px;
+    padding:0 20px;
+    text-align: center;
+    cursor: pointer;
+}
+#currentText article {
+    margin: 1em auto;
+    max-width: 480px;
+    padding: 0 20px;
+}
+#currentText article p {
+    margin-bottom: .5em;
+}
+.chapter-dice {
+    max-width: 50px;
+}
+.charResult {
+    flex-grow: 1;
+    line-height: 0;
+}
+.charRolls {
+    font-size: 32px;
+    line-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+/*------------------------------------*/
+/* rules for Rules page*/
+.rules {
+    padding:50px;
+}
+.rules main {
+    padding: 0;
+}
+.rules h1, .rules h2, .rules h3 {
+    margin: 2em 0 1em;
+}
+.rules p, li {
+    margin-bottom: .5em;
+}
+.rules ul, ol {
+    padding-left: 40px;
 }
