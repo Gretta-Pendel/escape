@@ -1,25 +1,26 @@
 'use strict';
+
+var Deck = [];
+var ItemsDeck = [];
+var Characters = [];
+// Deck tracker
+var index = 0;
+var currentCard = Deck[0];
+
+var charactersSelects = [];
+var charNumber = 0;
+var startHealth = charNumber == 2 ? 18 : charNumber == 3 ? 14 : charNumber == 4 ? 12 : 18;
+
+// Saving progress
+var gameSave = {
+    gameCharNumber: charNumber,
+    gameDeck: Deck,
+    gameDeckIndex: index,
+    gameItemsDeck: ItemsDeck,
+    gameCharacters: Characters
+};    
+
 window.addEventListener("DOMContentLoaded", function () {
-
-    var Deck = [];
-    var ItemsDeck = [];
-    var Characters = [];
-    // Deck tracker
-    var index = 0;
-    var currentCard = Deck[0];
-
-    var charactersSelects = [];
-    var charNumber = 2;
-    var startHealth = charNumber == 2 ? 18 : charNumber == 3 ? 14 : charNumber == 4 ? 12 : 0;
-
-    // Saving progress
-    var gameSave = {
-        gameCharNumber: charNumber,
-        gameDeck: Deck,
-        gameDeckIndex: index,
-        gameItemsDeck: ItemsDeck,
-        gameCharacters: Characters
-    };    
     
     let rulesBox = document.getElementById('rules');
     let deckBox = document.getElementById('deckBox');
@@ -38,54 +39,54 @@ window.addEventListener("DOMContentLoaded", function () {
     saveButton.addEventListener('click', save);
     loadButton.addEventListener('click', load);
 
-// Build Deck
-function buildDeck() {
-    Deck.push(StartCard);    
-    BuildDeckByData(deckLength, ChapterCards);
-    let boss = getRndInteger(0, 2);
-    Deck.push(BossCards[boss]);  
-}
+    function buildDeck() {
+        Deck.push(StartCard);    
+        BuildDeckByData(deckLength, ChapterCards);
+        let boss = getRndInteger(0, 2);
+        Deck.push(BossCards[boss]);  
+    }
 
-// Build Items Deck
-function buildItemsDeck() {
-    BuildItemsDeck();
-}
+    function buildItemsDeck() {
+        BuildItemsDeck();
+    }
 
-// New game
-function startNewGame() { 
-    Deck = [];
-    ItemsDeck = [];
-    Characters = [];
-    charactersSelects = [];
-    buildDeck();
-    buildItemsDeck();
-}
+    function startNewGame() { 
+        Deck = [];
+        ItemsDeck = [];
+        Characters = [];
+        charactersSelects = [];
+        buildDeck();
+        buildItemsDeck();
+    }
 
-function save() {
-    saveGame();
-    let jsonSave = JSON.stringify(gameSave);
-    var data = [new ClipboardItem({ "text/plain": new Blob([jsonSave], { type: "text/plain" }) })];
-    navigator.clipboard.write(data).then(function() {
-        console.log("Copied to clipboard successfully!");
-    }, function() {
-        console.error("Unable to write to clipboard. :-(");
-    });
-    alert("В буфере обмена код. Его нужно вставить в пустой текстовый файл и бережно сохранить.");
-}
+    function save() {
+        saveGame();
+        let jsonSave = JSON.stringify(gameSave);
+        var data = [new ClipboardItem({ "text/plain": new Blob([jsonSave], { type: "text/plain" }) })];
+        navigator.clipboard.write(data).then(function() {
+            console.log("Copied to clipboard successfully!");
+        }, function() {
+            console.error("Unable to write to clipboard. :-(");
+        });
+        alert("В буфере обмена код. Его нужно вставить в пустой текстовый файл и бережно сохранить.");
+    }
 
-function load() {
-    let result = prompt("Тут должен быть код из сэйва", '{"gameCharNumber":2,"gameDeck":[],"gameDeckIndex":0,"gameItemsDeck":[],"gameCharacters":[]}');
-    let value = JSON.parse(result);
-    gameSave = value;
-    Deck = gameSave.gameDeck;
-    ItemsDeck = gameSave.gameItemsDeck;
-    Characters = gameSave.gameCharacters;
-    index = gameSave.gameDeckIndex || 0;
-    charNumber = gameSave.gameCharNumber;
-    currentCard = Deck[0];
-    renderCharacterSelect(charNumber);
-    renderCharacters();
-}
+    function load() {
+        let result = prompt("Тут должен быть код из сэйва", '{"gameCharNumber":2,"gameDeck":[],"gameDeckIndex":0,"gameItemsDeck":[],"gameCharacters":[]}');
+        let value = JSON.parse(result);
+        gameSave = value;
+        Deck = gameSave.gameDeck;
+        ItemsDeck = gameSave.gameItemsDeck;
+        Characters = gameSave.gameCharacters;
+        index = gameSave.gameDeckIndex || 0;
+        charNumber = gameSave.gameCharNumber;
+        startHealth = charNumber == 2 ? 18 : charNumber == 3 ? 14 : charNumber == 4 ? 12 : 18;
+        currentCard = Deck[0];
+        renderCharacterSelect(charNumber);
+        renderCharacters();
+        if(charNumber>1)
+            charactersNumber[charNumber - 1].selected = true;
+    }
 
     function saveGame() {
         gameSave = {
@@ -96,7 +97,8 @@ function load() {
             gameCharacters: Characters        
         };
     }
-    // Rules Navigation
+
+    // Rules Navigation (Right sidebar)
     rulesBox.insertAdjacentHTML('beforeend', "<a href=rules.html target=_blank>Правила ></a>");
     rulesBox.insertAdjacentHTML('beforeend', rules);
     let rulesH2 = rulesBox.getElementsByTagName('h2');
@@ -127,50 +129,6 @@ function load() {
     });
 
 
-    // New Game
-    // Characters number
-    charactersNumber.addEventListener('change', function () {
-        if (Characters.length > 0) {
-            let ok = confirm("Игра начнется заново. Вы уверены?");
-            if (!ok) return;
-        }
-        // Clear cahracters:
-        charactersBox.innerHTML = "";
-        charNumber = charactersNumber.value;
-        Characters = [{},{},{},{}];
-        // render character selects:
-        renderCharacterSelect(charactersNumber.value);
-        charactersSelects = document.getElementsByName('characterSelect');
-        // Choose Characters:
-        for (let index = 0; index < charactersSelects.length; index++) {
-            const charSelect = charactersSelects[index];
-            charSelect.addEventListener("change", function () {
-                let val = this.value;
-                let die = CharacterDice.filter(item => item[0] == val)[0];
-                for (const _charSelect of charactersSelects) {
-                    if (_charSelect != charSelect) {
-                        for (var i = 0; i < _charSelect.options.length; i++) {
-                            if (_charSelect.options[i].value == val)
-                                _charSelect.remove(i);
-                        }
-                    }
-                }
-                // add Character to characters global array                
-                Characters[index] = {
-                    Job: val,
-                    Image: die[2],
-                    Dice: die[1],
-                    StartHealth: startHealth,
-                    Health: startHealth,
-                    Items: []
-                }; 
-                // show characters in their containers
-                renderCharacters();
-            });
-        }
-    });
-
-    // functions
     // Turn over - show next Card
     function turnOver(i) {
         if (i > deckLength + 1) {
@@ -215,11 +173,227 @@ function load() {
         createImage(currentDeckBox, "", 'card', defaultCover);
     }
 
+
+    // New Game
+    // Characters number
+    charactersNumber.addEventListener('change', function () {
+        if (Characters.length > 0) {
+            let ok = confirm("Игра начнется заново. Вы уверены?");
+            if (!ok) return;
+        }
+        startNewGame();
+        // Clear characters:
+        charactersBox.innerHTML = "";
+        charNumber = charactersNumber.value;
+        startHealth = charNumber == 2 ? 18 : charNumber == 3 ? 14 : charNumber == 4 ? 12 : 18;
+        Characters = [{},{},{},{}];
+        // render character selects:
+        renderCharacterSelect(charactersNumber.value);
+        charactersSelects = document.getElementsByName('characterSelect');
+        // Choose Characters:
+        for (let index = 0; index < charactersSelects.length; index++) {
+            const charSelect = charactersSelects[index];
+            charSelect.addEventListener("change", function () {
+                let val = this.value;
+                let die = CharacterDice.filter(item => item[0] == val)[0];
+                for (const _charSelect of charactersSelects) {
+                    if (_charSelect != charSelect) {
+                        for (var i = 0; i < _charSelect.options.length; i++) {
+                            if (_charSelect.options[i].value == val)
+                                _charSelect.remove(i);
+                        }
+                    }
+                }
+                // add Character to characters global array                
+                Characters[index] = {
+                    Job: val,
+                    Image: die[2],
+                    Dice: die[1],
+                    StartHealth: startHealth,
+                    Health: startHealth,
+                    Items: []
+                }; 
+                // show characters in their containers
+                renderCharacters();
+            });
+        }
+    });
+
+    // Render character selects
+    function renderCharacterSelect(n) {        
+        newGame.innerHTML = '';
+        for (let i = 0; i < n; i++) {
+            let characterSelect = document.createElement('select');
+            characterSelect.id = "character" + (i + 1) + "Select";
+            characterSelect.name = "characterSelect";
+            let firstOption = document.createElement('option');
+            firstOption.name = "Выберите персонажа";
+            firstOption.value = "";
+            firstOption.innerHTML = "Выберите персонажа";
+            characterSelect.appendChild(firstOption);
+            for (const char of CharacterDice) {
+                let charOption = document.createElement('option');
+                charOption.name = char[0];
+                charOption.value = char[0];
+                charOption.innerHTML = char[0];
+                characterSelect.appendChild(charOption);
+            }
+            if (Characters[i] && Characters[i].Job) {
+                characterSelect.value = Characters[i].Job;
+                //characterSelect.options[country.options.selectedIndex].selected = true;
+            }
+            else {
+                characterSelect[0].selected = true;
+            }
+            newGame.append(characterSelect);
+        }
+    }
+
+    // Build Deck 15 of 45
+    function BuildDeckByData(count, cardList) {
+        if (count < 1) return;
+        let rnd, arrayCards = cardList;
+        rnd = getRndInteger(0, arrayCards.length - 1);
+        Deck.push(arrayCards[rnd]);
+        arrayCards.splice(rnd, 1);
+        BuildDeckByData(count - 1, arrayCards);
+    }
+
+    // Build Items Deck
+    function BuildItemsDeck() {
+        for (const item of ItemsCards) {
+            for (let i = 0; i < item.Count; i++) {
+                ItemsDeck.push(item);
+            }
+        }
+    }
+
+    // Render Current card
+    function renderCurrentCard(card) {
+        let cardElement = document.createElement('article');
+
+
+        let cardText = ``;
+        if (card.Name) {
+            cardText += `<h3>${card.Name}</h3>`;
+        }
+        if (card.Text) {
+            for (let t = 0; t < card.Text.length; t++) {
+                cardText += card.Text[t]
+            }
+        }
+        //createImage(cardElement,'card',card.Image)
+        cardElement.insertAdjacentHTML('beforeend', cardText);
+        if (card.Actions) {
+            let actions = document.createElement('div');
+            for (let a = 0; a < card.Actions.length; a++) {
+                if (card.Actions[a].Description) {
+                    let desc = document.createElement('p');
+                    desc.innerHTML = card.Actions[a].Description;
+                    actions.append(desc);
+                }
+                if (card.Actions[a].Damage) {
+                    let dmg = document.createElement('div');
+                    dmg.innerHTML = "<b>Урон: </b>" + card.Actions[a].Damage;
+                    actions.append(dmg);
+                }
+                if (card.Actions[a].Dice) {
+                    let dice = document.createElement('div');
+                    dice.className = "card-dice";
+                    for (const d in card.Actions[a].Dice) {
+                        let n = card.Actions[a].Dice[d];
+                        if (n != "character") {
+                            //createImage(dice, 'dice/', 'chapter-dice', n + '.svg');                        
+                            let charRollImg = document.createElement("img");
+                            charRollImg.className = "chapter-dice";
+                            charRollImg.setAttribute("src", "img/dice/" + n + ".svg");
+                            dice.append(charRollImg);
+                            charRollImg.addEventListener('click', function () {
+                                charRollImg.className = 'hide';
+                            });
+                        }
+                    }
+                    
+                    if (~card.Actions[a].Dice.indexOf("character")) {
+                        let charRolls = document.createElement('span');
+                        charRolls.className = "charRolls";
+                        //charRolls.innerHTML = "<img class=\"chapter-dice\" src=\"img/dice/character.svg\">: [";
+                        charRolls.innerHTML = "[";
+                        for (let i = 0; i < charNumber; i++) {
+                            let result = ChapterDice[getRndInteger(0, 5)];
+                            let charRollImg = document.createElement("img");
+                            charRollImg.className = "chapter-dice";
+                            charRollImg.setAttribute("src", "img/dice/" + result + ".svg");
+                            charRolls.append(charRollImg);
+                            charRollImg.addEventListener('click', function () {
+                                charRollImg.className = 'hide';
+                            });
+                            //createImage(charRolls, 'dice/', 'chapter-dice', result + '.svg');                            
+                        }
+                        charRolls.insertAdjacentHTML('beforeend', ']');
+                        dice.append(charRolls);
+                    }
+                    actions.append(dice);
+                }
+                cardElement.append(actions);
+            }
+        }
+
+        let cardDice = document.createElement('div');
+        cardDice.className = "cardDice";
+
+        // Roll button and result
+        let cardButton = document.createElement('button');
+        cardButton.innerText = "🎲";
+        cardButton.setAttribute("title", "Бросить кубик");
+        cardButton.className = "cardButton";
+        cardDice.append(cardButton);
+
+        let charResult = document.createElement('div');
+        charResult.className = 'charResult';
+        cardButton.addEventListener('click', function () {
+            let rnd = ChapterDice[getRndInteger(0, 5)];
+            //charResult.innerHTML = "";
+            createImage(charResult, 'dice/', 'dice', rnd + '.svg')
+        });
+        cardDice.append(charResult);
+        cardElement.append(cardDice);
+
+
+
+        // var _cardRolls = document.getElementsByClassName("chapter-dice");
+        // console.log(_cardRolls);
+        // console.log(typeof _cardRolls);
+        // //console.log(Object.values(_cardRolls));
+        // for (let item of _cardRolls) {
+        //     console.log(item);
+        // }
+
+        // var sssss = document.getElementsByName('characterSelect');
+        // console.log(sssss);
+        // console.log(typeof sssss);
+        // console.log(sssss[0]);
+        // console.log(Array.from(cardRolls));
+        // Array.prototype.forEach.call(cardRolls, function(el) {
+        //     console.log(el.tagName);
+        // });
+        // for (let i = 0; i < _cardRolls.length; i++) {
+        //     const cr = _cardRolls[i];
+        //     console.log(cr)
+        //     cr.addEventListener('click', function () {
+        //         cd.className = 'hide';
+        //     });
+        // }
+    
+
+        return cardElement;
+    }
+
     // Render Characters
     function renderCharacters() {
         charactersBox.innerHTML = "";
         for (const char of Characters) {
-            if (!char) return;
+            if (!char || !char.Job) return;
             let charBox = document.createElement('article');
             let charBar = document.createElement('div');
             let charItems = document.createElement('div');
@@ -235,9 +409,13 @@ function load() {
             charHealth.value = char.Health;
             charHP.innerHTML = "HP: ";
             charHP.append(charHealth);
-            charHealth.addEventListener('onchange', function () {
-                char.Health = charHealth.value;
-                saveGame();
+            charHealth.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    char.Health = charHealth.value;
+                    saveGame();
+                    console.log("saved")
+                    charHealth.blur();
+                }
             });
             //charHP.insertAdjacentHTML('beforeend', "HP: ");
             charHP.insertAdjacentHTML('beforeend', " / " + char.StartHealth);
@@ -303,54 +481,74 @@ function load() {
             charactersBox.append(charBox);
         }
     }
-    // Render character selects
-    function renderCharacterSelect(n) {        
-        newGame.innerHTML = '';
-        for (let i = 0; i < n; i++) {
-            let characterSelect = document.createElement('select');
-            characterSelect.id = "character" + (i + 1) + "Select";
-            characterSelect.name = "characterSelect";
-            let firstOption = document.createElement('option');
-            firstOption.name = "Выберите персонажа";
-            firstOption.value = "Выберите персонажа";
-            firstOption.innerHTML = "Выберите персонажа";
-            characterSelect.appendChild(firstOption);            
-            for (const char of CharacterDice) {
-                let charOption = document.createElement('option');
-                charOption.name = char[0];
-                charOption.value = char[0];
-                charOption.innerHTML = char[0];
-                characterSelect.appendChild(charOption);
+
+    // render Item
+    function renderItem(char, parent) {
+        //if (!char.Items || !char.Items.length) return;
+        parent.innerHTML = '';
+        for (const item of char.Items) {
+            let itemBox = document.createElement('div');
+            let posChar = Characters.indexOf(char);
+            itemBox.className = 'item-box';
+            if (item.Image)
+                createImage(itemBox, 'items/', 'item', item.Image);
+            itemBox.insertAdjacentHTML('beforeend', '<div>' + item.Name + '</div>');
+            itemBox.insertAdjacentHTML('beforeend', '<div class=type>' + item.Type + '</div>');
+            itemBox.insertAdjacentHTML('beforeend', '<div>' + item.Text + '</div>');
+            let itemDiscard = document.createElement('button');
+            itemDiscard.className = 'discard'
+            itemDiscard.innerHTML = '🪣';
+            itemDiscard.setAttribute("title", "Сбросить");
+            itemBox.append(itemDiscard);
+            itemDiscard.addEventListener('click', function () {
+                if (Characters.find(el => el == char)) {
+                    let posItem = Characters[posChar].Items.indexOf(item);
+                    Characters[posChar].Items.splice(posItem, 1);
+                }
+                renderItem(char, parent);
+            });
+
+            if (posChar > 0) {
+                let itemMoveUp = document.createElement('button');
+                itemMoveUp.className = 'move-up';
+                itemMoveUp.innerHTML = '🔼';
+                itemMoveUp.setAttribute("title", "Переместить");
+                itemBox.append(itemMoveUp);
+                itemMoveUp.addEventListener('click', function () {
+                    let char2 = Characters[posChar - 1];
+                    moveItem(item, char, char2);
+                    renderCharacters();
+                });                
             }
-            if (Characters.length > 0 && Characters[i]) {
-                characterSelect.value = Characters[i].Job;
+            if (posChar < charNumber - 1) {
+                let itemMoveDown = document.createElement('button');
+                itemMoveDown.className = 'move-down';
+                itemMoveDown.innerHTML = '🔽';
+                itemMoveDown.setAttribute("title", "Переместить");
+                itemBox.append(itemMoveDown);
+                itemMoveDown.addEventListener('click', function () {
+                    let char2 = Characters[posChar + 1];
+                    moveItem(item, char, char2);
+                    renderCharacters();
+                });
+
             }
-            newGame.append(characterSelect);
-        }
-    }
+
+            parent.append(itemBox);
+        }    
+    }    
 
     // Random number from min to max
     function getRndInteger(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // Build Deck 15 of 45
-    function BuildDeckByData(count, cardList) {
-        if (count < 1) return;
-        let rnd, arrayCards = cardList;
-        rnd = getRndInteger(0, arrayCards.length - 1);
-        Deck.push(arrayCards[rnd]);
-        arrayCards.splice(rnd, 1);
-        BuildDeckByData(count - 1, arrayCards);
-    }
-
-    // Build Items Deck
-    function BuildItemsDeck() {
-        for (const item of ItemsCards) {
-            for (let i = 0; i < item.Count; i++) {
-                ItemsDeck.push(item);
-            }
-        }
+    // Create <img> and push into parent element
+    function createImage(parent, path, cssclass, name) {
+        let img = document.createElement('img');
+        img.setAttribute('class', cssclass);
+        img.setAttribute('src', 'img/' + path + name);
+        parent.append(img);
     }
 
     // Get Item from Itemd Deck
@@ -362,114 +560,14 @@ function load() {
         return item;
     }
 
-    // Create <img> and push into parent element
-    function createImage(parent, path, cssclass, name) {
-        let img = document.createElement('img');
-        img.setAttribute('class', cssclass);
-        img.setAttribute('src', 'img/' + path + name);
-        parent.append(img);
+    // Move Item from one Character to another
+    function moveItem(item,char1,char2) {
+        if (Characters.find(el => el == char1) && Characters.find(el => el == char2)) {
+            let posChar1 = Characters.indexOf(char1);
+            let posChar2 = Characters.indexOf(char2);
+            let posItem = Characters[posChar1].Items.indexOf(item);
+            Characters[posChar1].Items.splice(posItem, 1);
+            Characters[posChar2].Items.push(item);
+        }
     }
-
-    // Render Current card
-    function renderCurrentCard(card) {
-        let cardElement = document.createElement('article');
-
-
-        let cardText = ``;
-        if (card.Name) {
-            cardText += `<h3>${card.Name}</h3>`;
-        }
-        if (card.Text) {
-            for (let t = 0; t < card.Text.length; t++) {
-                cardText += card.Text[t]
-            }
-        }
-        //createImage(cardElement,'card',card.Image)
-        cardElement.insertAdjacentHTML('beforeend', cardText);
-        if (card.Actions) {
-            let actions = document.createElement('div');
-            for (let a = 0; a < card.Actions.length; a++) {
-                if (card.Actions[a].Description) {
-                    let desc = document.createElement('p');
-                    desc.innerHTML = card.Actions[a].Description;
-                    actions.append(desc);
-                }
-                if (card.Actions[a].Damage) {
-                    let dmg = document.createElement('div');
-                    dmg.innerHTML = "<b>Урон: </b>" + card.Actions[a].Damage;
-                    actions.append(dmg);
-                }
-                if (card.Actions[a].Dice) {
-                    let dice = document.createElement('div');
-                    for (const d in card.Actions[a].Dice) {
-                        let n = card.Actions[a].Dice[d];
-                        createImage(dice, 'dice/', 'chapter-dice', n + '.svg')
-                    }
-                    actions.append(dice);
-
-                    if (~card.Actions[a].Dice.indexOf("character")) {
-                        let charRolls = document.createElement('div');
-                        charRolls.className = "charRolls";
-                        charRolls.innerHTML = "<img class=\"chapter-dice\" src=\"img/dice/character.svg\">: [";
-                        for (let i = 0; i < Characters.length; i++) {
-                            let result = ChapterDice[getRndInteger(0, 5)];
-                            createImage(charRolls, 'dice/', 'chapter-dice', result + '.svg')
-                        }
-                        charRolls.insertAdjacentHTML('beforeend', ']');
-                        actions.append(charRolls);
-                    }
-                }
-                cardElement.append(actions);
-            }
-        }
-
-        let cardDice = document.createElement('div');
-        cardDice.className = "cardDice";
-
-        // Roll button and result
-        let cardButton = document.createElement('button');
-        cardButton.innerText = "🎲";
-        cardButton.setAttribute("title", "Бросить кубик");
-        cardButton.className = "cardButton";
-        cardDice.append(cardButton);
-
-        let charResult = document.createElement('div');
-        charResult.className = 'charResult';
-        cardButton.addEventListener('click', function () {
-            let rnd = ChapterDice[getRndInteger(0, 5)];
-            //charResult.innerHTML = "";
-            createImage(charResult, 'dice/', 'dice', rnd + '.svg')
-        });
-        cardDice.append(charResult);
-        cardElement.append(cardDice);
-
-        return cardElement;
-    }
-
-    // render Item
-    function renderItem(char, parent) {
-        parent.innerHTML = '';
-        for (const item of char.Items) {
-            let itemBox = document.createElement('div');
-            itemBox.className = 'item-box';
-            if (item.Image)
-                createImage(itemBox, 'items/', 'item', item.Image);
-            itemBox.insertAdjacentHTML('beforeend', '<div>' + item.Name + '</div>');
-            itemBox.insertAdjacentHTML('beforeend', '<div class=type>' + item.Type + '</div>');
-            itemBox.insertAdjacentHTML('beforeend', '<div>' + item.Text + '</div>');
-            let itemDiscard = document.createElement('button');
-            itemDiscard.innerHTML = '🪣';
-            itemDiscard.setAttribute("title", "Сбросить");
-            itemBox.append(itemDiscard);
-            itemDiscard.addEventListener('click', function () {
-                if (Characters.find(el => el == char)) {
-                    let posChar = Characters.indexOf(char);
-                    let porItem = Characters[posChar].Items.indexOf(item);
-                    Characters[posChar].Items.splice(porItem, 1);
-                }
-                renderItem(char, parent);
-            });
-            parent.append(itemBox);
-        }    
-    }    
 });

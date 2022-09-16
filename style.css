@@ -202,15 +202,23 @@ img.item + div {
 }
 .item-box button {
     position: absolute;
-    right:0;
-    bottom:0;
     width:25px;
     height:25px;
+    bottom:0;
     line-height: 25px;
     font-size: 18px;
     border-radius:0;
     padding: 0;
     border:1px solid #ccc;
+}
+.item-box button.discard {
+    right:0;
+}
+.item-box button.move-up {
+    left:0;
+}
+.item-box button.move-down {
+    left:25px;
 }
 
 /* Deck */
@@ -250,6 +258,9 @@ img.item + div {
     line-height: 40px;
     display: flex;
     align-items: center;
+}
+.card-dice {
+    display: flex;
 }
 
 /*------------------------------------*/
